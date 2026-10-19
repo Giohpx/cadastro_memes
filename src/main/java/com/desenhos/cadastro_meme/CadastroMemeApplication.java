@@ -9,5 +9,4 @@ public class CadastroMemeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CadastroMemeApplication.class, args);
 	}
-
 }

@@ -13,6 +13,9 @@ public class Desenho {
     @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false, unique = true) // 'unique = true' garante que não existam emails repetidos
+    private String email;
+
     @Column(nullable = false)
     private String descricao;
 
@@ -21,8 +24,9 @@ public class Desenho {
 
     public Desenho() {}
 
-    public Desenho(String nome, String descricao, String urlImagem) {
+    public Desenho(String nome, String email, String descricao, String urlImagem) {
         this.nome = nome;
+        this.email = email;
         this.descricao = descricao;
         this.urlImagem = urlImagem;
     }
@@ -32,6 +36,9 @@ public class Desenho {
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }

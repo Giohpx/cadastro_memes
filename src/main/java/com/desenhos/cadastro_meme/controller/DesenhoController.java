@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/desenho")
 @RequiredArgsConstructor
@@ -19,14 +21,14 @@ public class DesenhoController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public ResponseEntity<Desenho> buscarDesenhoPorId(@RequestParam Long id){
-        return ResponseEntity.ok(desenhoService.buscarDesenhoPorId(id));
+    @GetMapping(params = "nome")
+    public ResponseEntity<List<Desenho>> buscarDesenhosPorNome(@RequestParam String nome){
+        return ResponseEntity.ok(desenhoService.buscarDesenhosPorNome(nome));
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deletarDesenho(@RequestParam Long id){
-        desenhoService.deletarDesenho(id);
+    @DeleteMapping(params = "nome")
+    public ResponseEntity<Void> deletarDesenhosPorNome(@RequestParam String nome){
+        desenhoService.deletarDesenhosPorNome(nome);
         return ResponseEntity.ok().build();
     }
 

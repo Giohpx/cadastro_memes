@@ -19,18 +19,20 @@ public class DesenhoService {
         return repository.saveAndFlush(desenho);
     }
 
-    public Desenho buscarDesenhoPorId(Long id) {
-        return repository.findById(id).orElseThrow(
-                () -> new RuntimeException("Desenho (Meme) não encontrado")
-        );
+    public List<Desenho> buscarDesenhosPorNome(String nome) {
+        return repository.findAllByNomeIgnoreCase(nome);
     }
 
     public List<Desenho> listarDesenhos() {
         return repository.findAll();
     }
 
-    public void deletarDesenho(Long id) {
-        repository.deleteById(id);
+    public void deletarDesenhosPorNome(String nome) {
+        List<Desenho> desenhos = repository.findAllByNomeIgnoreCase(nome);
+        if (desenhos.isEmpty()) {
+            throw new RuntimeException("Desenho (Meme) não encontrado");
+        }
+        repository.deleteAll(desenhos);
     }
 
     public void atualizarDesenhoPorId(Long id, Desenho desenhoAtualizado) {

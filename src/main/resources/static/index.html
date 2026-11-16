@@ -3,71 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acervo de Memes - Desenhos</title>
+    <meta name="description" content="Cadastro e consulta de memes.">
+    <title>Acervo de Memes</title>
     <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
 </head>
 <body>
-<div class="container">
-    <h1>Cadastrar Novo Meme</h1>
-    <form id="memeForm">
-        <label for="nome">Nome do Meme:</label>
-        <input type="text" id="nome" required placeholder="Ex: Pernalonga Comunista">
+<header class="site-header">
+    <div class="container header-content">
+        <h1>Acervo de Memes</h1>
+        <span>Cadastro e consulta</span>
+    </div>
+</header>
 
-        <label for="descricao">Descrição ou Origem:</label>
-        <input type="text" id="descricao" required placeholder="Ex: Episódio de 1940">
+<main class="container">
+    <section class="section" aria-labelledby="create-title">
+        <h2 id="create-title">Cadastrar meme</h2>
+        <form id="meme-form" class="form-grid">
+            <div class="field">
+                <label for="nome">Nome</label>
+                <input id="nome" name="nome" type="text" maxlength="255" required>
+            </div>
+            <div class="field">
+                <label for="email">E-mail do responsável</label>
+                <input id="email" name="email" type="email" maxlength="255" required>
+            </div>
+            <div class="field field-wide">
+                <label for="descricao">Descrição ou origem</label>
+                <textarea id="descricao" name="descricao" rows="2" maxlength="2000" required></textarea>
+            </div>
+            <div class="field field-wide">
+                <label for="urlImagem">URL da imagem</label>
+                <input id="urlImagem" name="urlImagem" type="url" maxlength="255" placeholder="https://exemplo.com/imagem.jpg" aria-describedby="image-url-hint" required>
+                <small id="image-url-hint" class="field-hint">Use um endereço completo começando com https:// ou http:// (até 255 caracteres).</small>
+            </div>
+            <div class="field-wide">
+                <button class="button button-primary" type="submit">Cadastrar</button>
+            </div>
+        </form>
+    </section>
 
-        <label for="urlImagem">URL da Imagem:</label>
-        <input type="url" id="urlImagem" required placeholder="https://link-da-imagem.com/meme.jpg">
+    <section class="section" aria-labelledby="list-title">
+        <div class="list-heading">
+            <div>
+                <h2 id="list-title">Memes cadastrados</h2>
+                <p class="muted">Todos os memes cadastrados no banco de dados.</p>
+            </div>
+            <button id="refresh-button" class="button button-secondary" type="button">Atualizar lista</button>
+        </div>
+        <form id="search-form" class="search-form" role="search">
+            <div class="field">
+                <label for="search-name">Buscar pelo nome</label>
+                <input id="search-name" name="nome" type="search" placeholder="Digite o nome do meme">
+            </div>
+            <button class="button button-primary" type="submit">Buscar</button>
+            <button id="show-all-button" class="button button-secondary" type="button">Mostrar todos</button>
+        </form>
+        <div id="status-message" class="status-message" role="status" aria-live="polite" hidden></div>
+        <p id="results-label" class="results-label" aria-live="polite"></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Imagem</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Ações</th>
+                </tr>
+                </thead>
+                <tbody id="meme-table-body"></tbody>
+            </table>
+            <p id="empty-state" class="empty-state" hidden>Nenhum meme encontrado.</p>
+        </div>
+    </section>
+</main>
 
-        <button type="submit">Salvar Meme</button>
+<dialog id="edit-dialog" aria-labelledby="edit-title">
+    <div class="dialog-heading">
+        <h2 id="edit-title">Editar meme</h2>
+        <button id="close-dialog" class="close-button" type="button" aria-label="Fechar">×</button>
+    </div>
+    <p class="muted">O e-mail do responsável não pode ser alterado.</p>
+    <form id="edit-form">
+        <input id="edit-id" name="id" type="hidden">
+        <div class="field">
+            <label for="edit-nome">Nome</label>
+            <input id="edit-nome" name="nome" type="text" maxlength="255" required>
+        </div>
+        <div class="field">
+            <label for="edit-descricao">Descrição ou origem</label>
+            <textarea id="edit-descricao" name="descricao" rows="3" maxlength="2000" required></textarea>
+        </div>
+        <div class="field">
+            <label for="edit-urlImagem">URL da imagem</label>
+            <input id="edit-urlImagem" name="urlImagem" type="url" maxlength="255" placeholder="https://exemplo.com/imagem.jpg" aria-describedby="edit-image-url-hint" required>
+            <small id="edit-image-url-hint" class="field-hint">Use um endereço completo começando com https:// ou http:// (até 255 caracteres).</small>
+        </div>
+        <div class="dialog-actions">
+            <button id="cancel-edit" class="button button-secondary" type="button">Cancelar</button>
+            <button class="button button-primary" type="submit">Salvar</button>
+        </div>
     </form>
-
-    <h2>Galeria de Memes</h2>
-    <div id="galeriaMemes" class="galeria"></div>
-</div>
-
-<script>
-    document.getElementById('memeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const nome = document.getElementById('nome').value;
-        const descricao = document.getElementById('descricao').value;
-        const urlImagem = document.getElementById('urlImagem').value;
-
-        await fetch('/api/desenhos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, descricao, urlImagem })
-        });
-
-        document.getElementById('memeForm').reset();
-        carregarMemes();
-    });
-
-    async function carregarMemes() {
-        const response = await fetch('/api/desenhos');
-        const memes = await response.json();
-        const galeria = document.getElementById('galeriaMemes');
-        galeria.innerHTML = '';
-
-        memes.forEach(meme => {
-            const card = document.createElement('div');
-            card.className = 'meme-card';
-            card.innerHTML = `
-                    <img src="${meme.urlImagem}" alt="${meme.nome}">
-                    <h3>${meme.nome}</h3>
-                    <p>${meme.descricao}</p>
-                    <button onclick="deletarMeme(${meme.id})">Excluir</button>
-                `;
-            galeria.appendChild(card);
-        });
-    }
-
-    async function deletarMeme(id) {
-        await fetch(`/api/desenhos/${id}`, { method: 'DELETE' });
-        carregarMemes();
-    }
-
-    carregarMemes();
-</script>
+</dialog>
 </body>
 </html>

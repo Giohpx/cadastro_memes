@@ -21,6 +21,11 @@ public class DesenhoController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping
+    public ResponseEntity<List<Desenho>> listarDesenhos(){
+        return ResponseEntity.ok(desenhoService.listarDesenhos());
+    }
+
     @GetMapping(params = "nome")
     public ResponseEntity<List<Desenho>> buscarDesenhosPorNome(@RequestParam String nome){
         return ResponseEntity.ok(desenhoService.buscarDesenhosPorNome(nome));
